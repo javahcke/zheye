@@ -21,6 +21,18 @@ const testData: ColumnProps[] = [
     title: 'test2的专栏',
     description: 'test2的专栏描述',
     avatar: 'https://www.gszhjr.com.cn/fastdfs/group1/M00/00/5C/rKgBEmLwwsqAWg0QAAAMNeDMYvo143.png'
+  },
+  {
+    id: 3,
+    title: 'test3的专栏',
+    description: 'test3的专栏描述'
+    // avatar: 'https://www.gszhjr.com.cn/fastdfs/group1/M00/01/83/rKgBEmS2R8OAIS_xAAAUBA_zEtQ365.png'
+  },
+  {
+    id: 4,
+    title: 'test4的专栏',
+    description: 'test4的专栏描述',
+    avatar: 'https://www.gszhjr.com.cn/fastdfs/group1/M00/00/5C/rKgBEmLwwsqAWg0QAAAMNeDMYvo143.png'
   }
 ]
 
