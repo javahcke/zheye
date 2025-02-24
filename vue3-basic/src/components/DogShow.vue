@@ -7,7 +7,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
     async setup() {
         const rawData = await axios.get(
-            "https://dog.ceo/api/breeds/image"
+            "https://dog.ceo/api/breeds/image/random"
         );
         return {
             result: rawData.data,
