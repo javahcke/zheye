@@ -1,6 +1,6 @@
 import { ref, onMounted, onUnmounted, Ref } from 'vue'
 
-const useClickOutside = (elementRef: Ref<HTMLDivElement | null>) => {
+const useClickOutside = (elementRef: Ref<HTMLElement | null>) => {
   const isClickOutside = ref(false)
   const handler = (e: MouseEvent) => {
     if (elementRef.value) {
