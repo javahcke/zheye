@@ -41,16 +41,17 @@ export default defineComponent({
     const onFormSubmit = (result: any) => {
       if (result) {
         const { columnId } = state.state.user
-        const newPost: PostProps = {
-          id: new Date().getTime(),
-          title: titleVal.value,
-          content: contentVal.value,
-          columnId,
-          createdAt: new Date().toLocaleString()
+        if (columnId) {
+          const newPost: PostProps = {
+            _id: String(new Date().getTime()),
+            title: titleVal.value,
+            content: contentVal.value,
+            column: String(columnId),
+            createdAt: new Date().toLocaleString()
+          }
+          state.commit('createPost', newPost)
+          router.push({ name: 'column', params: { id: columnId } })
         }
-        console.log(newPost)
-        state.commit('createPost', newPost)
-        router.push({ name: 'column', params: { id: columnId } })
       }
     }
     return {
