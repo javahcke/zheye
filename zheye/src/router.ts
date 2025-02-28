@@ -17,6 +17,12 @@ const router = createRouter({
       }
     },
     {
+      path: '/signup',
+      name: 'signup',
+      component: () => import('./views/Signup.vue'),
+      meta: { redirectAlreadyLogin: true }
+    },
+    {
       path: '/column/:id',
       name: 'column',
       component: () => import('./views/ColumnDetail.vue')

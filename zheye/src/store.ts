@@ -1,10 +1,11 @@
 import { createStore, Commit } from 'vuex'
 import axios from 'axios'
-interface UserProps {
+export interface UserProps {
   isLogin: boolean;
-  name?: string;
-  id?: number;
-  columnId?: number;
+  nickName?: string;
+  _id?: string;
+  column?: string;
+  email?: string;
 }
 interface ImageProps {
   _id: number;
@@ -26,27 +27,40 @@ export interface ColumnProps {
   avatar?: ImageProps;
   description: string;
 }
+export interface GlobalErrorProps {
+  status: boolean;
+  message?: string;
+}
 export interface GlobalDataProps {
+  token: string;
   loading: boolean;
   columns: ColumnProps[];
   posts: PostProps[];
   user: UserProps;
+  error: GlobalErrorProps;
 }
 const getAndCommit = async (url: string, mutationName: string, commit: Commit) => {
   const { data } = await axios.get(url)
   commit(mutationName, data)
 }
+const postAndCommit = async (url: string, mutationName: string, commit: Commit, payload: any) => {
+  const { data } = await axios.post(url, payload)
+  commit(mutationName, data)
+  return data
+}
 const store = createStore<GlobalDataProps>({
   state: {
+    token: localStorage.getItem('token') || '',
     loading: false,
     columns: [],
     posts: [],
-    user: { isLogin: true, name: '张三', id: 1, columnId: 1 }
+    user: { isLogin: false },
+    error: { status: false }
   },
   mutations: {
-    login (state) {
-      state.user = { ...state.user, isLogin: true, name: '张三', id: 1 }
-    },
+    // login (state) {
+    //   state.user = { ...state.user, isLogin: true, name: '张三', id: 1 }
+    // },
     createPost (state, newPost) {
       state.posts.push(newPost)
     },
@@ -61,6 +75,17 @@ const store = createStore<GlobalDataProps>({
     },
     setLoading (state, status) {
       state.loading = status
+    },
+    setError (state, e: GlobalErrorProps) {
+      state.error = e
+    },
+    fetchCurrentUser (state, rawData) {
+      state.user = { isLogin: true, ...rawData.data }
+    },
+    login (state, rawData) {
+      state.token = rawData.data.token
+      localStorage.setItem('token', rawData.data.token)
+      axios.defaults.headers.common.Authorization = `Bearer ${rawData.data.token}`
     }
   },
   actions: {
@@ -72,6 +97,15 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPosts ({ commit }, cid) {
       getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
+    },
+    fetchCurrentUser ({ commit }) {
+      getAndCommit('/user/current', 'fetchCurrentUser', commit)
+    },
+    login ({ commit }, payload) {
+      return postAndCommit('/user/login', 'login', commit, payload)
+    },
+    loginAndFetch ({ dispatch }, payload) {
+      return dispatch('login', payload).then(() => dispatch('fetchCurrentUser'))
     }
   },
   getters: {

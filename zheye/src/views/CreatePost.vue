@@ -40,17 +40,17 @@ export default defineComponent({
     const state = useStore<GlobalDataProps>()
     const onFormSubmit = (result: any) => {
       if (result) {
-        const { columnId } = state.state.user
-        if (columnId) {
+        const { column } = state.state.user
+        if (column) {
           const newPost: PostProps = {
             _id: String(new Date().getTime()),
             title: titleVal.value,
             content: contentVal.value,
-            column: String(columnId),
+            column: String(column),
             createdAt: new Date().toLocaleString()
           }
           state.commit('createPost', newPost)
-          router.push({ name: 'column', params: { id: columnId } })
+          router.push({ name: 'column', params: { id: column } })
         }
       }
     }
