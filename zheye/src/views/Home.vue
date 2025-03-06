@@ -11,6 +11,17 @@
         </div>
       </div>
     </section>
+    <!-- <uploader action="/upload" :beforeUpload="beforeUpload" @file-uploaded="onFileUploaded">
+      <h2>点击上传</h2>
+      <template #loading>
+        <div class="spinner-border" role="status">
+          <span class="sr-only"></span>
+        </div>
+      </template>
+      <template #success="dataProps">
+        <img :src="dataProps.uploadedData.data.url" :alt="dataProps.uploadedData.data.fileName" width="200">
+      </template>
+    </uploader> -->
     <h4 class="font-weight-bold text-center">发现精彩</h4>
     <column-list :list="list"></column-list>
     <button
@@ -23,12 +34,15 @@
 <script lang="ts">
 import { defineComponent, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
-import { GlobalDataProps, ColumnProps } from '../store'
+import { GlobalDataProps, ResponseType, ImageProps } from '../store'
 import ColumnList from '../components/ColumnList.vue'
+// import Uploader from '@/components/Uploader.vue'
+import createMessage from '@/hooks/createMessage'
 
 export default defineComponent({
   components: {
     ColumnList
+    // Uploader
   },
   setup () {
     const store = useStore<GlobalDataProps>()
@@ -36,8 +50,20 @@ export default defineComponent({
       store.dispatch('fetchColumns')
     })
     const list = computed(() => store.state.columns)
+    const beforeUpload = (file: File) => {
+      const isJPG = file.type === 'image/jpeg'
+      if (!isJPG) {
+        createMessage('上传图片只能是 JPG 格式!', 'error', 2000)
+      }
+      return isJPG
+    }
+    const onFileUploaded = (rawData: ResponseType<ImageProps>) => {
+      createMessage(`上传成功 ${rawData.data._id}`, 'success', 2000)
+    }
     return {
-      list
+      list,
+      beforeUpload,
+      onFileUploaded
     }
   }
 })
