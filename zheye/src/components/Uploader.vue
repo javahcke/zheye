@@ -4,7 +4,7 @@
       <slot v-if="fileStatus === 'uploading'" name="loading">
         <button class="btn btn-primary">正在上传...</button>
       </slot>
-      <slot v-if="fileStatus === 'success'" name="success" :uploadedData="uploadedData">
+      <slot v-if="fileStatus === 'success'" name="uploaded" :uploadedData="uploadedData">
         <button class="btn btn-primary">上传成功</button>
       </slot>
       <slot v-if="fileStatus === 'ready'" name="default">
@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, PropType } from 'vue'
+import { defineComponent, ref, PropType, watch } from 'vue'
 import axios from 'axios'
 type UploadStats = 'ready' | 'uploading' | 'success' | 'error' | 'abort'
 type CheckFunction = (file: File) => boolean
@@ -29,14 +29,30 @@ export default defineComponent({
     },
     beforeUpload: {
       type: Function as PropType<CheckFunction>
+    },
+    uploaded: {
+      type: Object
     }
   },
   inheritAttrs: false,
   emits: ['file-uploaded', 'file-uploaded-error'],
   setup (props, context) {
     const fileInput = ref<null | HTMLInputElement>(null)
-    const fileStatus = ref<UploadStats>('ready')
-    const uploadedData = ref()
+    const fileStatus = ref<UploadStats>(props.uploaded ? 'success' : 'ready')
+    const uploadedData = ref(props.uploaded)
+    watch(() => props.uploaded, (newVal) => {
+      if (newVal) {
+        console.log(newVal)
+        if (newVal.data) {
+          fileStatus.value = 'success'
+          uploadedData.value = newVal
+        } else {
+          fileStatus.value = 'ready'
+        }
+        // fileStatus.value = 'success'
+        // uploadedData.value = newVal
+      }
+    })
     const triggerUpload = () => {
       if (fileInput.value) {
         fileInput.value.click()

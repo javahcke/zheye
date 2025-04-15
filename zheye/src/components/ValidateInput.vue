@@ -4,9 +4,8 @@
     <input
       class="form-control" :class="{ 'is-invalid': inputRef.error }"
       @blur="validateInput"
-      :value="inputRef.val"
-      @input="updateVal"
       v-bind="$attrs"
+      v-model="inputRef.val"
       v-if="tag === 'input'"
     >
     <textarea
@@ -14,15 +13,14 @@
       class="form-control"
       :class="{ 'is-invalid': inputRef.error }"
       @blur="validateInput"
-      :value="inputRef.val"
-      @input="updateVal"
       v-bind="$attrs"
+      v-model="inputRef.val"
     ></textarea>
     <span v-if="inputRef.error" class="invalid-feedback">{{ inputRef.message }}</span>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, reactive, onMounted } from 'vue'
+import { defineComponent, PropType, reactive, onMounted, computed } from 'vue'
 import { emitter } from './ValidateForm.vue'
 const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 interface RuleProp {
@@ -43,15 +41,15 @@ export default defineComponent({
   },
   setup (props, context) {
     const inputRef = reactive({
-      val: props.modelValue || '',
+      val: computed({
+        get: () => props.modelValue || '',
+        set: val => {
+          context.emit('update:modelValue', val)
+        }
+      }),
       error: false,
       message: ''
     })
-    const updateVal = (event: KeyboardEvent) => {
-      const tergetValue = (event.target as HTMLInputElement).value
-      inputRef.val = tergetValue
-      context.emit('update:modelValue', tergetValue)
-    }
     const validateInput = () => {
       if (props.rules) {
         const allPassed = props.rules.every(rule => {
@@ -82,8 +80,7 @@ export default defineComponent({
     })
     return {
       inputRef,
-      validateInput,
-      updateVal
+      validateInput
     }
   }
 })
